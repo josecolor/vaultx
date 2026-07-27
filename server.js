@@ -257,3 +257,103 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`[VaultX] Servidor corriendo en el puerto ${PORT}`);
 });
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const ADMIN_BYPASS_TOKEN = process.env.ADMIN_BYPASS_TOKEN || '';
+const ADMIN_BYPASS_COOKIE = 'vx_admin_bypass';
+
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  const cookies = {};
+  header.split(';').forEach(part => {
+    const [key, ...rest] = part.trim().split('=');
+    if (key) cookies[key] = decodeURIComponent(rest.join('='));
+  });
+  return cookies;
+}
+
+function isAdminRequest(req) {
+  const cookies = parseCookies(req);
+  if (cookies[ADMIN_BYPASS_COOKIE] && cookies[ADMIN_BYPASS_COOKIE] === ADMIN_BYPASS_TOKEN) {
+    return true;
+  }
+  if (req.session && req.session.adminEmail === ADMIN_EMAIL) {
+    return true;
+  }
+  return false;
+}
+
+app.get('/api/admin/bypass', (req, res) => {
+  const { token } = req.query;
+  if (!token || token !== ADMIN_BYPASS_TOKEN) {
+    return res.status(403).json({ error: 'Token inválido.' });
+  }
+  res.setHeader('Set-Cookie', `${ADMIN_BYPASS_COOKIE}=${ADMIN_BYPASS_TOKEN}; Max-Age=31536000; Path=/; HttpOnly; SameSite=Lax`);
+  res.send('Bypass de administrador activado en este navegador.');
+});
+
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/css/') || req.path.startsWith('/js/')) {
+    return next();
+  }
+
+  if (isAdminRequest(req)) {
+    return next();
+  }
+
+  try {
+    const cookies = parseCookies(req);
+    let sessionId = cookies['vx_sid'];
+
+    if (!sessionId) {
+      sessionId = crypto.randomBytes(16).toString('hex');
+      res.setHeader('Set-Cookie', `vx_sid=${sessionId}; Max-Age=1800; Path=/; HttpOnly; SameSite=Lax`);
+    }
+
+    await pool.query(
+      `INSERT INTO analytics_sessions (session_id, primera_visita, ultima_actividad, total_paginas_vistas)
+       VALUES ($1, NOW(), NOW(), 1)
+       ON CONFLICT (session_id)
+       DO UPDATE SET ultima_actividad = NOW(), total_paginas_vistas = analytics_sessions.total_paginas_vistas + 1`,
+      [sessionId]
+    );
+
+    await pool.query(
+      `INSERT INTO analytics_visits (path, session_id, user_agent) VALUES ($1, $2, $3)`,
+      [req.path, sessionId, req.headers['user-agent'] || null]
+    );
+  } catch (err) {
+    console.error('[VaultX] Error registrando analítica:', err.message);
+  }
+
+  next();
+});
+
+app.get('/api/admin/metrics', async (req, res) => {
+  if (!isAdminRequest(req)) {
+    return res.status(403).json({ error: 'No autorizado.' });
+  }
+
+  try {
+    const totalVisitas = await pool.query('SELECT COUNT(*) FROM analytics_visits');
+    const totalSesiones = await pool.query('SELECT COUNT(*) FROM analytics_sessions');
+    const tiempoPromedio = await pool.query(
+      `SELECT AVG(EXTRACT(EPOCH FROM (ultima_actividad - primera_visita))) AS promedio_segundos
+       FROM analytics_sessions WHERE total_paginas_vistas > 1`
+    );
+    const paginasMasVisitadas = await pool.query(
+      `SELECT path, COUNT(*) AS visitas FROM analytics_visits
+       GROUP BY path ORDER BY visitas DESC LIMIT 10`
+    );
+
+    res.json({
+      total_visitas: parseInt(totalVisitas.rows[0].count),
+      total_sesiones: parseInt(totalSesiones.rows[0].count),
+      tiempo_promedio_segundos: Math.round(tiempoPromedio.rows[0].promedio_segundos || 0),
+      paginas_mas_visitadas: paginasMasVisitadas.rows
+    });
+  } catch (err) {
+    console.error('[VaultX] Error en /api/admin/metrics:', err.message);
+    res.status(500).json({ error: 'Error al obtener métricas.' });
+  }
+});
