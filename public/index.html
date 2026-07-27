@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaultX — The Elite Vault</title>
+  <meta name="description" content="VaultX — plataforma de culto para streetwear y sneakers de edición limitada.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- ============================================ -->
+  <!-- HEADER -->
+  <!-- ============================================ -->
+  <header class="vx-header">
+    <div class="vx-header__inner">
+      <a href="/" class="vx-logo">VAULT<span class="vx-logo__accent">X</span></a>
+      <nav class="vx-nav">
+        <a href="#drop" class="vx-nav__link">Drop Actual</a>
+        <a href="#creator-corner" class="vx-nav__link">El Rincón del Creador</a>
+        <a href="#waitlist" class="vx-nav__link vx-nav__link--cta">Early Access</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================ -->
+  <!-- HERO — VITRINA PRINCIPAL -->
+  <!-- ============================================ -->
+  <main>
+    <section class="vx-vault" id="drop">
+      <div class="vx-vault__glow" id="vaultGlow"></div>
+
+      <div class="vx-vault__content">
+        <p class="vx-vault__eyebrow">Pieza del día</p>
+
+        <div class="vx-piece" id="pieceContainer">
+          <div class="vx-piece__frame">
+            <img
+              id="pieceImage"
+              class="vx-piece__image"
+              src=""
+              alt=""
+              style="display:none;"
+            >
+            <div class="vx-piece__placeholder" id="piecePlaceholder">
+              <span>Aún no hay una pieza activa</span>
+            </div>
+          </div>
+
+          <div class="vx-piece__info">
+            <h1 class="vx-piece__name" id="pieceName">Esperando el próximo drop</h1>
+            <p class="vx-piece__desc" id="pieceDesc">
+              Vuelve pronto — cada pieza en VaultX se libera una sola vez.
+            </p>
+
+            <div class="vx-countdown" id="countdown">
+              <div class="vx-countdown__unit">
+                <span class="vx-countdown__num" id="cdDays">00</span>
+                <span class="vx-countdown__label">días</span>
+              </div>
+              <div class="vx-countdown__unit">
+                <span class="vx-countdown__num" id="cdHours">00</span>
+                <span class="vx-countdown__label">hrs</span>
+              </div>
+              <div class="vx-countdown__unit">
+                <span class="vx-countdown__num" id="cdMins">00</span>
+                <span class="vx-countdown__label">min</span>
+              </div>
+              <div class="vx-countdown__unit">
+                <span class="vx-countdown__num" id="cdSecs">00</span>
+                <span class="vx-countdown__label">seg</span>
+              </div>
+            </div>
+
+            <form class="vx-waitlist" id="waitlistForm">
+              <input
+                type="text"
+                id="waitlistContact"
+                class="vx-waitlist__input"
+                placeholder="Correo o WhatsApp"
+                required
+              >
+              <button type="submit" class="vx-waitlist__btn">Unirme a la lista</button>
+            </form>
+            <p class="vx-waitlist__msg" id="waitlistMsg"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- EL RINCÓN DEL CREADOR -->
+    <!-- ============================================ -->
+    <section class="vx-creator" id="creator-corner">
+      <h2 class="vx-section-title">El Rincón del Creador</h2>
+      <p class="vx-section-sub">
+        ¿Diseñas piezas de culto? Postúlate — el registro es único y gratuito.
+      </p>
+      <a href="#" class="vx-btn vx-btn--outline">Postular mi marca</a>
+    </section>
+  </main>
+
+  <!-- ============================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================ -->
+  <footer class="vx-footer">
+    <p>VaultX &copy; 2026 — Respaldado por <span class="vx-footer__mxl">MXL</span></p>
+  </footer>
+
+  <script src="/js/vault.js"></script>
+</body>
+</html>
