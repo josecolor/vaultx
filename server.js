@@ -1,8 +1,3 @@
-// ============================================
-// VAULTX - Backend principal (MXL Architecture)
-// Archivo monolítico - sin require() de módulos propios
-// ============================================
-
 const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -12,14 +7,12 @@ const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const multer = require('multer');
 const path = require('path');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ============================================
-// CONEXIÓN A POSTGRES (Railway)
-// ============================================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
@@ -34,9 +27,6 @@ pool.connect()
     console.error('[VaultX] Error conectando a Postgres:', err.message);
   });
 
-// ============================================
-// SEGURIDAD - HELMET (headers, CSP, anti-clickjacking)
-// ============================================
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -52,11 +42,8 @@ app.use(helmet({
 
 app.use(compression());
 
-// ============================================
-// RATE LIMITING - Protección anti-bots
-// ============================================
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 15 * 60 * 1000,
   max: 200,
   standardHeaders: true,
   legacyHeaders: false,
@@ -73,9 +60,6 @@ const strictLimiter = rateLimit({
 
 app.use(generalLimiter);
 
-// ============================================
-// SESIONES SEGURAS (persistidas en Postgres)
-// ============================================
 app.use(session({
   store: new pgSession({
     pool: pool,
@@ -88,25 +72,18 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    maxAge: 24 * 60 * 60 * 1000,
     sameSite: 'lax'
   }
 }));
 
-// ============================================
-// PARSERS
-// ============================================
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
-// ============================================
-// SUBIDA DE ARCHIVOS SEGURA (multer)
-// Documentos sensibles: validación estricta de MIME y tamaño
-// ============================================
-const storage = multer.memoryStorage(); // nunca a disco sin cifrar
+const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB máximo
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (allowedMimes.includes(file.mimetype)) {
@@ -117,30 +94,20 @@ const upload = multer({
   }
 });
 
-// ============================================
-// ARCHIVOS ESTÁTICOS (frontend)
-// ============================================
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ============================================
-// RUTAS BASE
-// ============================================
-
-// Health check (para Railway)
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'VaultX', timestamp: new Date().toISOString() });
 });
 
-// Ruta principal - sirve la vitrina
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Endpoint de ejemplo: obtener la pieza del día (para sync cromática)
 app.get('/api/piece-of-the-day', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, nombre, imagen, color_dominante_hex, fecha_drop
+      `SELECT id, nombre, descripcion, imagen, color_dominante_hex, fecha_drop
        FROM pieces
        WHERE estado = 'activa'
        ORDER BY fecha_drop DESC
@@ -153,7 +120,6 @@ app.get('/api/piece-of-the-day', async (req, res) => {
   }
 });
 
-// Endpoint de ejemplo: unirse a waitlist (con rate limit estricto)
 app.post('/api/waitlist', strictLimiter, async (req, res) => {
   const { contact, piece_id } = req.body;
   if (!contact || !piece_id) {
@@ -171,22 +137,123 @@ app.post('/api/waitlist', strictLimiter, async (req, res) => {
   }
 });
 
-// ============================================
-// MANEJO DE ERRORES GLOBAL
-// ============================================
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY
+  ? Buffer.from(process.env.ENCRYPTION_KEY, 'hex')
+  : null;
+
+if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
+  console.error('[VaultX] ADVERTENCIA: ENCRYPTION_KEY no está configurada o es inválida.');
+}
+
+function encryptBuffer(buffer) {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
+  const encrypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  return {
+    ciphertext: encrypted.toString('base64'),
+    iv: iv.toString('hex'),
+    authTag: authTag.toString('hex')
+  };
+}
+
+function decryptBuffer(ciphertextBase64, ivHex, authTagHex) {
+  const iv = Buffer.from(ivHex, 'hex');
+  const authTag = Buffer.from(authTagHex, 'hex');
+  const encrypted = Buffer.from(ciphertextBase64, 'base64');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
+  decipher.setAuthTag(authTag);
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+}
+
+async function emailYaRegistrado(email) {
+  const result = await pool.query(
+    'SELECT id FROM creators WHERE email = $1',
+    [email.toLowerCase().trim()]
+  );
+  return result.rows.length > 0;
+}
+
+app.post('/api/creators/apply', strictLimiter, upload.single('documento'), async (req, res) => {
+  const { nombre, bio, ciudad, genero_musical, email } = req.body;
+
+  if (!nombre || !email) {
+    return res.status(400).json({ error: 'Nombre y correo son obligatorios.' });
+  }
+
+  const emailNormalizado = email.toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailNormalizado)) {
+    return res.status(400).json({ error: 'Correo electrónico inválido.' });
+  }
+
+  try {
+    const yaExiste = await emailYaRegistrado(emailNormalizado);
+    if (yaExiste) {
+      return res.status(409).json({
+        error: 'Este correo ya tiene una postulación registrada. El registro es único por diseñador.'
+      });
+    }
+
+    let documentosCifrados = null;
+    let documentosIv = null;
+    let documentosAuthTag = null;
+    let documentoNombreOriginal = null;
+    let documentoMime = null;
+
+    if (req.file) {
+      if (!ENCRYPTION_KEY) {
+        return res.status(500).json({ error: 'El sistema de cifrado no está disponible en este momento.' });
+      }
+      const { ciphertext, iv, authTag } = encryptBuffer(req.file.buffer);
+      documentosCifrados = ciphertext;
+      documentosIv = iv;
+      documentosAuthTag = authTag;
+      documentoNombreOriginal = req.file.originalname;
+      documentoMime = req.file.mimetype;
+    }
+
+    const result = await pool.query(
+      `INSERT INTO creators
+        (nombre, bio, ciudad, genero_musical, email, estado_membresia,
+         documentos_cifrados, documentos_iv, documentos_auth_tag,
+         documentos_nombre_original, documentos_mime, verificado)
+       VALUES ($1, $2, $3, $4, $5, 'pendiente', $6, $7, $8, $9, $10, false)
+       RETURNING id, nombre, email, estado_membresia, creado_en`,
+      [
+        nombre.trim(),
+        bio || null,
+        ciudad || null,
+        genero_musical || null,
+        emailNormalizado,
+        documentosCifrados,
+        documentosIv,
+        documentosAuthTag,
+        documentoNombreOriginal,
+        documentoMime
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Postulación recibida. Nuestro equipo la revisará pronto.',
+      creator: result.rows[0]
+    });
+  } catch (err) {
+    console.error('[VaultX] Error en /api/creators/apply:', err.message);
+    res.status(500).json({ error: 'Error al procesar la postulación.' });
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error('[VaultX] Error no controlado:', err.message);
   res.status(500).json({ error: 'Error interno del servidor.' });
 });
 
-// 404
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada.' });
 });
 
-// ============================================
-// INICIO DEL SERVIDOR
-// ============================================
 app.listen(PORT, () => {
   console.log(`[VaultX] Servidor corriendo en el puerto ${PORT}`);
 });
