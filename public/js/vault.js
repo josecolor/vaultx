@@ -119,3 +119,65 @@ document.getElementById('waitlistForm').addEventListener('submit', async (e) => 
 // INICIO
 // ============================================
 loadPieceOfTheDay();
+
+const TRADUCCIONES = {
+  es: {
+    nav_drop: 'Drop Actual',
+    nav_creator: 'El Rincón del Creador',
+    nav_early: 'Early Access',
+    piece_of_day: 'Pieza del día',
+    days: 'días',
+    hours: 'hrs',
+    minutes: 'min',
+    seconds: 'seg',
+    waitlist_placeholder: 'Correo o WhatsApp',
+    join_waitlist: 'Unirme a la lista',
+    creator_corner_title: 'El Rincón del Creador'
+  },
+  en: {
+    nav_drop: 'Current Drop',
+    nav_creator: "Creator's Corner",
+    nav_early: 'Early Access',
+    piece_of_day: 'Piece of the Day',
+    days: 'days',
+    hours: 'hrs',
+    minutes: 'min',
+    seconds: 'sec',
+    waitlist_placeholder: 'Email or WhatsApp',
+    join_waitlist: 'Join the waitlist',
+    creator_corner_title: "Creator's Corner"
+  }
+};
+
+function aplicarTraducciones(idioma) {
+  const dict = TRADUCCIONES[idioma] || TRADUCCIONES.es;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) {
+      el.textContent = dict[key];
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key]) {
+      el.setAttribute('placeholder', dict[key]);
+    }
+  });
+
+  document.documentElement.setAttribute('lang', idioma);
+}
+
+async function inicializarIdioma() {
+  try {
+    const res = await fetch('/api/detect-language');
+    const data = await res.json();
+    aplicarTraducciones(data.lang);
+  } catch (err) {
+    console.error('[VaultX] Error detectando idioma:', err.message);
+    aplicarTraducciones('es');
+  }
+}
+
+inicializarIdioma();

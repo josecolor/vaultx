@@ -16,9 +16,9 @@
     <div class="vx-header__inner">
       <a href="/" class="vx-logo">VAULT<span class="vx-logo__accent">X</span></a>
       <nav class="vx-nav">
-        <a href="#drop" class="vx-nav__link">Drop Actual</a>
-        <a href="#creator-corner" class="vx-nav__link">El Rincón del Creador</a>
-        <a href="#waitlist" class="vx-nav__link vx-nav__link--cta">Early Access</a>
+        <a href="#drop" class="vx-nav__link" data-i18n="nav_drop">Drop Actual</a>
+        <a href="#creator-corner" class="vx-nav__link" data-i18n="nav_creator">El Rincón del Creador</a>
+        <a href="#waitlist" class="vx-nav__link vx-nav__link--cta" data-i18n="nav_early">Early Access</a>
       </nav>
     </div>
   </header>
@@ -31,7 +31,7 @@
       <div class="vx-vault__glow" id="vaultGlow"></div>
 
       <div class="vx-vault__content">
-        <p class="vx-vault__eyebrow">Pieza del día</p>
+        <p class="vx-vault__eyebrow" data-i18n="piece_of_day">Pieza del día</p>
 
         <div class="vx-piece" id="pieceContainer">
           <div class="vx-piece__frame">
@@ -56,19 +56,19 @@
             <div class="vx-countdown" id="countdown">
               <div class="vx-countdown__unit">
                 <span class="vx-countdown__num" id="cdDays">00</span>
-                <span class="vx-countdown__label">días</span>
+                <span class="vx-countdown__label" data-i18n="days">días</span>
               </div>
               <div class="vx-countdown__unit">
                 <span class="vx-countdown__num" id="cdHours">00</span>
-                <span class="vx-countdown__label">hrs</span>
+                <span class="vx-countdown__label" data-i18n="hours">hrs</span>
               </div>
               <div class="vx-countdown__unit">
                 <span class="vx-countdown__num" id="cdMins">00</span>
-                <span class="vx-countdown__label">min</span>
+                <span class="vx-countdown__label" data-i18n="minutes">min</span>
               </div>
               <div class="vx-countdown__unit">
                 <span class="vx-countdown__num" id="cdSecs">00</span>
-                <span class="vx-countdown__label">seg</span>
+                <span class="vx-countdown__label" data-i18n="seconds">seg</span>
               </div>
             </div>
 
@@ -77,10 +77,10 @@
                 type="text"
                 id="waitlistContact"
                 class="vx-waitlist__input"
-                placeholder="Correo o WhatsApp"
+                placeholder="Correo o WhatsApp" data-i18n-placeholder="waitlist_placeholder"
                 required
               >
-              <button type="submit" class="vx-waitlist__btn">Unirme a la lista</button>
+              <button type="submit" class="vx-waitlist__btn" data-i18n="join_waitlist">Unirme a la lista</button>
             </form>
             <p class="vx-waitlist__msg" id="waitlistMsg"></p>
           </div>
@@ -92,7 +92,7 @@
     <!-- EL RINCÓN DEL CREADOR -->
     <!-- ============================================ -->
     <section class="vx-creator" id="creator-corner">
-      <h2 class="vx-section-title">El Rincón del Creador</h2>
+      <h2 class="vx-section-title" data-i18n="creator_corner_title">El Rincón del Creador</h2>
       <p class="vx-section-sub">
         ¿Diseñas piezas de culto? Postúlate — el registro es único y gratuito.
       </p>
