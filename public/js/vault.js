@@ -181,3 +181,60 @@ async function inicializarIdioma() {
 }
 
 inicializarIdioma();
+
+const FOMO_MENSAJES = {
+  es: [
+    { ciudad: 'Madrid', tipo: 'creador', texto: 'Un creador de {ciudad} se postuló hace {tiempo}' },
+    { ciudad: 'Miami', tipo: 'waitlist', texto: 'Alguien en {ciudad} se acaba de unir a la lista' },
+    { ciudad: 'Santo Domingo', tipo: 'waitlist', texto: 'Alguien en {ciudad} se acaba de unir a la lista' },
+    { ciudad: 'Los Ángeles', tipo: 'creador', texto: 'Un creador de {ciudad} se postuló hace {tiempo}' },
+    { ciudad: 'Nueva York', tipo: 'waitlist', texto: 'Alguien en {ciudad} se acaba de unir a la lista' }
+  ],
+  en: [
+    { ciudad: 'Madrid', tipo: 'creador', texto: 'A creator from {ciudad} applied {tiempo} ago' },
+    { ciudad: 'Miami', tipo: 'waitlist', texto: 'Someone in {ciudad} just joined the waitlist' },
+    { ciudad: 'Santo Domingo', tipo: 'waitlist', texto: 'Someone in {ciudad} just joined the waitlist' },
+    { ciudad: 'Los Angeles', tipo: 'creador', texto: 'A creator from {ciudad} applied {tiempo} ago' },
+    { ciudad: 'New York', tipo: 'waitlist', texto: 'Someone in {ciudad} just joined the waitlist' }
+  ]
+};
+
+const FOMO_TIEMPOS = { es: ['2 min', '3 min', '5 min', '8 min'], en: ['2 min', '3 min', '5 min', '8 min'] };
+
+let idiomaActual = 'es';
+let fomoInterval = null;
+
+function mostrarFomoToast() {
+  const toast = document.getElementById('fomoToast');
+  if (!toast) return;
+
+  const mensajes = FOMO_MENSAJES[idiomaActual] || FOMO_MENSAJES.es;
+  const tiempos = FOMO_TIEMPOS[idiomaActual] || FOMO_TIEMPOS.es;
+  const mensaje = mensajes[Math.floor(Math.random() * mensajes.length)];
+  const tiempo = tiempos[Math.floor(Math.random() * tiempos.length)];
+
+  const texto = mensaje.texto
+    .replace('{ciudad}', mensaje.ciudad)
+    .replace('{tiempo}', tiempo);
+
+  toast.querySelector('.vx-fomo-toast__text').textContent = texto;
+  toast.classList.add('vx-fomo-toast--visible');
+
+  setTimeout(() => {
+    toast.classList.remove('vx-fomo-toast--visible');
+  }, 5000);
+}
+
+function iniciarFomoToasts() {
+  setTimeout(mostrarFomoToast, 4000);
+  fomoInterval = setInterval(mostrarFomoToast, 15000);
+}
+
+// Sobrescribe aplicarTraducciones para también sincronizar el idioma del FOMO
+const aplicarTraduccionesOriginal = aplicarTraducciones;
+aplicarTraducciones = function(idioma) {
+  aplicarTraduccionesOriginal(idioma);
+  idiomaActual = idioma;
+};
+
+iniciarFomoToasts();
