@@ -345,6 +345,33 @@ app.get('/api/admin/metrics', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener métricas.' });
   }
 });
+const IDIOMAS_SOPORTADOS = ['es', 'en', 'fr', 'pt'];
+const IDIOMA_DEFAULT = 'es';
+
+function detectarIdioma(req) {
+  const header = req.headers['accept-language'] || '';
+  const preferencias = header.split(',').map(part => {
+    const [lang] = part.trim().split(';');
+    return lang.split('-')[0].toLowerCase();
+  });
+
+  for (const pref of preferencias) {
+    if (IDIOMAS_SOPORTADOS.includes(pref)) {
+      return pref;
+    }
+  }
+  return IDIOMA_DEFAULT;
+}
+
+app.get('/api/detect-language', (req, res) => {
+  const cookies = parseCookies(req);
+  if (cookies['vx_lang'] && IDIOMAS_SOPORTADOS.includes(cookies['vx_lang'])) {
+    return res.json({ lang: cookies['vx_lang'], source: 'cookie' });
+  }
+  const idioma = detectarIdioma(req);
+  res.setHeader('Set-Cookie', `vx_lang=${idioma}; Max-Age=31536000; Path=/; SameSite=Lax`);
+  res.json({ lang: idioma, source: 'accept-language' });
+});
 app.use((err, req, res, next) => {
   console.error('[VaultX] Error no controlado:', err.message);
   res.status(500).json({ error: 'Error interno del servidor.' });
@@ -357,4 +384,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`[VaultX] Servidor corriendo en el puerto ${PORT}`);
 });
+
 
