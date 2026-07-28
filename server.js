@@ -245,19 +245,6 @@ app.post('/api/creators/apply', strictLimiter, upload.single('documento'), async
   }
 });
 
-app.use((err, req, res, next) => {
-  console.error('[VaultX] Error no controlado:', err.message);
-  res.status(500).json({ error: 'Error interno del servidor.' });
-});
-
-app.use((req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada.' });
-});
-
-app.listen(PORT, () => {
-  console.log(`[VaultX] Servidor corriendo en el puerto ${PORT}`);
-});
-
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
 const ADMIN_BYPASS_TOKEN = process.env.ADMIN_BYPASS_TOKEN || '';
 const ADMIN_BYPASS_COOKIE = 'vx_admin_bypass';
@@ -357,3 +344,16 @@ app.get('/api/admin/metrics', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener métricas.' });
   }
 });
+app.use((err, req, res, next) => {
+  console.error('[VaultX] Error no controlado:', err.message);
+  res.status(500).json({ error: 'Error interno del servidor.' });
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Ruta no encontrada.' });
+});
+
+app.listen(PORT, () => {
+  console.log(`[VaultX] Servidor corriendo en el puerto ${PORT}`);
+});
+
