@@ -579,3 +579,22 @@ body {
 .vx-unlock-btn:hover, .vx-waitlist__btn:hover {
   transform: translateZ(40px);
 }
+
+.vx-vault-cinematic__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  width: 100%;
+  max-width: 450px;
+  padding: 0 20px;
+}
+
+.vx-dials-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
