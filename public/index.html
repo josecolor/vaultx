@@ -8,15 +8,33 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+
+  <!-- ============================================ -->
+  <!-- CINEMÁTICA 3D — BÓVEDA CON DIALES Y CLAVE -->
+  <!-- ============================================ -->
   <div class="vx-vault-cinematic" id="vaultCinematic">
-    <div class="vx-vault-door vx-vault-door--left"><span class="vx-vault-door__ring"></span></div>
-    <div class="vx-vault-door vx-vault-door--right"><span class="vx-vault-door__ring"></span></div>
-    <div class="vx-vault-cinematic__label">
+    <div class="vx-vault-door vx-vault-door--left">
+      <span class="vx-vault-door__ring"></span>
+    </div>
+    <div class="vx-vault-door vx-vault-door--right">
+      <span class="vx-vault-door__ring"></span>
+    </div>
+    <div class="vx-vault-cinematic__content">
       <div class="vx-vault-cinematic__logo">VAULT<span>X</span></div>
-      Abriendo la bóveda...
+      <div class="vx-vault-sub">LOS ANGELES (LOWRIDER) // INFERNO VAULT</div>
+      <p class="vx-vault-instruction">Gira los diales o presiona para forzar apertura</p>
+      
+      <!-- Diales de combinación interactivos -->
+      <div class="vx-dials-container">
+        <div class="vx-dial">0</div>
+        <div class="vx-dial">0</div>
+        <div class="vx-dial">0</div>
+        <div class="vx-dial">0</div>
+      </div>
+      
+      <button class="vx-unlock-btn" id="unlockVaultBtn">FORZAR APERTURA DE BÓVEDA</button>
     </div>
   </div>
-
 
   <!-- ============================================ -->
   <!-- HEADER -->
@@ -39,73 +57,206 @@
     <section class="vx-vault" id="drop">
       <div class="vx-vault__glow" id="vaultGlow"></div>
 
-      <div class="vx-vault__content">
-        <p class="vx-vault__eyebrow" data-i18n="piece_of_day">Pieza del día</p>
-
-        <div class="vx-piece" id="pieceContainer">
-          <div class="vx-piece__frame">
-            <img
-              id="pieceImage"
-              class="vx-piece__image"
-              src=""
-              alt=""
-              style="display:none;"
-            >
+      <div class="vx-vault__container">
+        <div class="vx-piece">
+          <div class="vx-piece__frame" id="pieceFrame">
             <div class="vx-piece__placeholder" id="piecePlaceholder">
-              <span>Aún no hay una pieza activa</span>
+              <div class="vx-spinner"></div>
+            </div>
+            <img id="pieceImage" class="vx-piece__img" src="" alt="" style="display: none;">
+          </div>
+        </div>
+
+        <div class="vx-piece-info">
+          <p class="vx-vault__eyebrow" data-i18n="piece_of_day">Pieza del día</p>
+          <h1 class="vx-piece-title" id="pieceName">Cargando pieza...</h1>
+          <p class="vx-piece-desc" id="pieceDesc">Sincronizando con la bóveda central...</p>
+
+          <div class="vx-countdown" id="countdown">
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdDays">02</span>
+              <span class="vx-countdown__label" data-i18n="days">días</span>
+            </div>
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdHours">06</span>
+              <span class="vx-countdown__label" data-i18n="hours">hrs</span>
+            </div>
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdMins">49</span>
+              <span class="vx-countdown__label" data-i18n="minutes">min</span>
+            </div>
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdSecs">45</span>
+              <span class="vx-countdown__label" data-i18n="seconds">seg</span>
             </div>
           </div>
 
-          <div class="vx-piece__info">
-            <h1 class="vx-piece__name" id="pieceName">Esperando el próximo drop</h1>
-            <p class="vx-piece__desc" id="pieceDesc">
-              Vuelve pronto — cada pieza en VaultX se libera una sola vez.
-            </p>
-
-            <div class="vx-countdown" id="countdown">
-              <div class="vx-countdown__unit">
-                <span class="vx-countdown__num" id="cdDays">00</span>
-                <span class="vx-countdown__label" data-i18n="days">días</span>
-              </div>
-              <div class="vx-countdown__unit">
-                <span class="vx-countdown__num" id="cdHours">00</span>
-                <span class="vx-countdown__label" data-i18n="hours">hrs</span>
-              </div>
-              <div class="vx-countdown__unit">
-                <span class="vx-countdown__num" id="cdMins">00</span>
-                <span class="vx-countdown__label" data-i18n="minutes">min</span>
-              </div>
-              <div class="vx-countdown__unit">
-                <span class="vx-countdown__num" id="cdSecs">00</span>
-                <span class="vx-countdown__label" data-i18n="seconds">seg</span>
-              </div>
-            </div>
-
-            <form class="vx-waitlist" id="waitlistForm">
-              <input
-                type="text"
-                id="waitlistContact"
-                class="vx-waitlist__input"
-                placeholder="Correo o WhatsApp" data-i18n-placeholder="waitlist_placeholder"
-                required
-              >
-              <button type="submit" class="vx-waitlist__btn" data-i18n="join_waitlist">Unirme a la lista</button>
-            </form>
-            <p class="vx-waitlist__msg" id="waitlistMsg"></p>
-          </div>
+          <form class="vx-waitlist" id="waitlistForm">
+            <input type="text" id="waitlistInput" class="vx-waitlist__input" placeholder="Correo o WhatsApp" data-i18n-placeholder="waitlist_placeholder" required>
+            <button type="submit" class="vx-waitlist__btn" data-i18n="join_waitlist">Unirme a la lista</button>
+          </form>
         </div>
       </div>
     </section>
 
     <!-- ============================================ -->
-    <!-- EL RINCÓN DEL CREADOR -->
+    <!-- RINCÓN DEL CREADOR — FORMULARIO DE POSTULACIÓN -->
     <!-- ============================================ -->
     <section class="vx-creator" id="creator-corner">
       <h2 class="vx-section-title" data-i18n="creator_corner_title">El Rincón del Creador</h2>
-      <p class="vx-section-sub">
-        ¿Diseñas piezas de culto? Postúlate — el registro es único y gratuito.
-      </p>
-      <a href="#" class="vx-btn vx-btn--outline">Postular mi marca</a>
+      <p class="vx-section-sub">¿Diseñas piezas de culto? Postúlate — el registro es único y gratuito.</p>
+
+      <form class="vx-creator-form" id="creatorForm" enctype="multipart/form-data">
+        <input type="text" name="nombre" placeholder="Nombre o marca" class="vx-waitlist__input" required>
+        <input type="email" name="email" placeholder="Correo electrónico" class="vx-waitlist__input" required>
+        <input type="text" name="ciudad" placeholder="Ciudad" class="vx-waitlist__input">
+        <input type="text" name="genero_musical" placeholder="Género musical" class="vx-waitlist__input">
+        <textarea name="bio" placeholder="Cuéntanos tu historia" class="vx-waitlist__input" rows="4"></textarea>
+        <label class="vx-creator-form__file-label">
+          Documento de identidad (cifrado AES-256)
+          <input type="file" name="documento" accept=".pdf,.jpg,.jpeg,.png">
+        </label>
+        <button type="submit" class="vx-waitlist__btn">Enviar postulación</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- ============================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================ -->
+  <footer class="vx-footer">
+    <p>VaultX &copy; 2026 — Respaldado por <span class="vx-footer__mxl">MXL</span></p>
+  </footer>
+
+  <div class="vx-fomo-toast" id="fomoToast">
+    <span class="vx-fomo-toast__dot"></span>
+    <span class="vx-fomo-toast__text"></span>
+  </div>
+
+  <script src="/js/vault.js"></script>
+</body>
+</html>
+EOFcat << 'EOF' > public/index.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VaultX — The Elite Vault</title>
+  <meta name="description" content="VaultX — plataforma de culto para streetwear y sneakers de edición limitada.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- ============================================ -->
+  <!-- CINEMÁTICA 3D — BÓVEDA CON DIALES Y CLAVE -->
+  <!-- ============================================ -->
+  <div class="vx-vault-cinematic" id="vaultCinematic">
+    <div class="vx-vault-door vx-vault-door--left">
+      <span class="vx-vault-door__ring"></span>
+    </div>
+    <div class="vx-vault-door vx-vault-door--right">
+      <span class="vx-vault-door__ring"></span>
+    </div>
+    <div class="vx-vault-cinematic__content">
+      <div class="vx-vault-cinematic__logo">VAULT<span>X</span></div>
+      <div class="vx-vault-sub">LOS ANGELES (LOWRIDER) // INFERNO VAULT</div>
+      <p class="vx-vault-instruction">Gira los diales o presiona para forzar apertura</p>
+      
+      <!-- Diales de combinación interactivos -->
+      <div class="vx-dials-container">
+        <div class="vx-dial">0</div>
+        <div class="vx-dial">0</div>
+        <div class="vx-dial">0</div>
+        <div class="vx-dial">0</div>
+      </div>
+      
+      <button class="vx-unlock-btn" id="unlockVaultBtn">FORZAR APERTURA DE BÓVEDA</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- HEADER -->
+  <!-- ============================================ -->
+  <header class="vx-header">
+    <div class="vx-header__inner">
+      <a href="/" class="vx-logo">VAULT<span class="vx-logo__accent">X</span></a>
+      <nav class="vx-nav">
+        <a href="#drop" class="vx-nav__link" data-i18n="nav_drop">Drop Actual</a>
+        <a href="#creator-corner" class="vx-nav__link" data-i18n="nav_creator">El Rincón del Creador</a>
+        <a href="#waitlist" class="vx-nav__link vx-nav__link--cta" data-i18n="nav_early">Early Access</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================ -->
+  <!-- HERO — VITRINA PRINCIPAL -->
+  <!-- ============================================ -->
+  <main>
+    <section class="vx-vault" id="drop">
+      <div class="vx-vault__glow" id="vaultGlow"></div>
+
+      <div class="vx-vault__container">
+        <div class="vx-piece">
+          <div class="vx-piece__frame" id="pieceFrame">
+            <div class="vx-piece__placeholder" id="piecePlaceholder">
+              <div class="vx-spinner"></div>
+            </div>
+            <img id="pieceImage" class="vx-piece__img" src="" alt="" style="display: none;">
+          </div>
+        </div>
+
+        <div class="vx-piece-info">
+          <p class="vx-vault__eyebrow" data-i18n="piece_of_day">Pieza del día</p>
+          <h1 class="vx-piece-title" id="pieceName">Cargando pieza...</h1>
+          <p class="vx-piece-desc" id="pieceDesc">Sincronizando con la bóveda central...</p>
+
+          <div class="vx-countdown" id="countdown">
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdDays">02</span>
+              <span class="vx-countdown__label" data-i18n="days">días</span>
+            </div>
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdHours">06</span>
+              <span class="vx-countdown__label" data-i18n="hours">hrs</span>
+            </div>
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdMins">49</span>
+              <span class="vx-countdown__label" data-i18n="minutes">min</span>
+            </div>
+            <div class="vx-countdown__item">
+              <span class="vx-countdown__num" id="cdSecs">45</span>
+              <span class="vx-countdown__label" data-i18n="seconds">seg</span>
+            </div>
+          </div>
+
+          <form class="vx-waitlist" id="waitlistForm">
+            <input type="text" id="waitlistInput" class="vx-waitlist__input" placeholder="Correo o WhatsApp" data-i18n-placeholder="waitlist_placeholder" required>
+            <button type="submit" class="vx-waitlist__btn" data-i18n="join_waitlist">Unirme a la lista</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- RINCÓN DEL CREADOR — FORMULARIO DE POSTULACIÓN -->
+    <!-- ============================================ -->
+    <section class="vx-creator" id="creator-corner">
+      <h2 class="vx-section-title" data-i18n="creator_corner_title">El Rincón del Creador</h2>
+      <p class="vx-section-sub">¿Diseñas piezas de culto? Postúlate — el registro es único y gratuito.</p>
+
+      <form class="vx-creator-form" id="creatorForm" enctype="multipart/form-data">
+        <input type="text" name="nombre" placeholder="Nombre o marca" class="vx-waitlist__input" required>
+        <input type="email" name="email" placeholder="Correo electrónico" class="vx-waitlist__input" required>
+        <input type="text" name="ciudad" placeholder="Ciudad" class="vx-waitlist__input">
+        <input type="text" name="genero_musical" placeholder="Género musical" class="vx-waitlist__input">
+        <textarea name="bio" placeholder="Cuéntanos tu historia" class="vx-waitlist__input" rows="4"></textarea>
+        <label class="vx-creator-form__file-label">
+          Documento de identidad (cifrado AES-256)
+          <input type="file" name="documento" accept=".pdf,.jpg,.jpeg,.png">
+        </label>
+        <button type="submit" class="vx-waitlist__btn">Enviar postulación</button>
+      </form>
     </section>
   </main>
 
