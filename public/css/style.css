@@ -430,3 +430,103 @@ body {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+.vx-vault-cinematic {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  perspective: 1200px;
+  background: #000;
+  overflow: hidden;
+}
+
+.vx-vault-door {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background:
+    linear-gradient(135deg, #0e0e0f 0%, #1a1a1c 40%, #0a0a0b 100%);
+  box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
+  transform-style: preserve-3d;
+  transition: transform 1.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.vx-vault-door--left {
+  transform-origin: left center;
+  border-right: 1px solid var(--vx-border-strong);
+}
+
+.vx-vault-door--right {
+  transform-origin: right center;
+  border-left: 1px solid var(--vx-border-strong);
+}
+
+.vx-vault-cinematic--opening .vx-vault-door--left {
+  transform: rotateY(-110deg);
+}
+
+.vx-vault-cinematic--opening .vx-vault-door--right {
+  transform: rotateY(110deg);
+}
+
+.vx-vault-cinematic--hidden {
+  display: none;
+}
+
+.vx-vault-door__ring {
+  position: absolute;
+  top: 50%;
+  border-radius: 50%;
+  border: 3px solid var(--vx-accent);
+  box-shadow: 0 0 24px var(--vx-accent-soft);
+}
+
+.vx-vault-door--left .vx-vault-door__ring {
+  right: 30px;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+}
+
+.vx-vault-door--right .vx-vault-door__ring {
+  left: 30px;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+}
+
+.vx-vault-cinematic__label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  color: var(--vx-metal);
+  letter-spacing: 3px;
+  font-size: 13px;
+  text-transform: uppercase;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.vx-vault-cinematic--opening .vx-vault-cinematic__label {
+  opacity: 0;
+}
+
+.vx-vault-cinematic__logo {
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--vx-text);
+  margin-bottom: 8px;
+}
+
+.vx-vault-cinematic__logo span {
+  color: var(--vx-accent);
+}
+
+body.vx-locked {
+  overflow: hidden;
+}
