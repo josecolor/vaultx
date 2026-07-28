@@ -238,3 +238,17 @@ aplicarTraducciones = function(idioma) {
 };
 
 iniciarFomoToasts();
+
+window.addEventListener('load', () => {
+  document.body.classList.add('vx-locked');
+  setTimeout(() => {
+    const cinematic = document.getElementById('vaultCinematic');
+    if (cinematic) {
+      cinematic.classList.add('vx-vault-cinematic--opening');
+      setTimeout(() => {
+        cinematic.remove();
+        document.body.classList.remove('vx-locked');
+      }, 1600);
+    }
+  }, 800);
+});
