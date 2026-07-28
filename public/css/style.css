@@ -530,3 +530,52 @@ body {
 body.vx-locked {
   overflow: hidden;
 }
+
+/* ============================================ */
+/* EFECTO 3D TOTAL — VOLUMEN Y PERSPECTIVA     */
+/* ============================================ */
+
+body {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.vx-vault {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.vx-piece__frame {
+  position: relative;
+  overflow: visible;
+  transform: translateZ(40px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--vx-accent-soft);
+  border-radius: var(--vx-radius);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.vx-piece__frame:hover {
+  transform: translateZ(60px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.9), 0 0 40px var(--vx-accent);
+}
+
+.vx-dial {
+  transform-style: preserve-3d;
+  transform: translateZ(20px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 2px 5px rgba(255,255,255,0.1), inset 0 -5px 15px rgba(0,0,0,0.8);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.vx-dial:hover {
+  transform: translateZ(35px) scale(1.08);
+}
+
+.vx-unlock-btn, .vx-waitlist__btn {
+  transform: translateZ(25px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vx-unlock-btn:hover, .vx-waitlist__btn:hover {
+  transform: translateZ(40px);
+}
